@@ -9,6 +9,20 @@
 
 
 
+# ========================
+# Python
+# ========================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+venv/
+.env.local
+.pytest_cache/
+.mypy_cache/
+
+
 # Flutter repo-specific
 /bin/cache/
 /bin/internal/bootstrap.bat
