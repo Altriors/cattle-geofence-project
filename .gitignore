@@ -159,3 +159,11 @@ firebase_config.json
 # enivornment 
 #===========================
 yolo_env/
+
+
+
+#================
+#jpgs and mp4s
+#================
+*.mp4
+*.jpg
