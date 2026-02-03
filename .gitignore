@@ -152,3 +152,10 @@ app.*.symbols
 google-services.json
 GoogleService-Info.plist
 firebase_config.json
+
+
+
+#===========================
+# enivornment 
+#===========================
+yolo_env/
