@@ -1,0 +1,11 @@
+# Dataset configuration
+path: D:/projects/cattle-geofence-project/backend/dataset  
+train: train/images
+val: val/images
+test: test/images
+
+# Number of classes
+nc: 1
+
+# Class names
+names: ['cattle']
