@@ -2,23 +2,31 @@ from ultralytics import YOLO
 import cv2
 import os
 
+
 class CattleDetector:
     """
-    Cattle detection using trained YOLOv8 model
+    Cattle detection using YOLOv8 model
     """
 
-    def __init__(self, model_path='../models/best.pt'):
-        if not os.path.exists(model_path):
-            print(f"⚠️ Model not found at {model_path}")
-            print("Using pre-trained yolov8n.pt instead")
+    def __init__(self, model_path='yolov8n.pt'):
+        """
+        Initialize detector
+
+        Args:
+            model_path: Path to YOLOv8 model (default: yolov8n.pt)
+        """
+
+        if not os.path.exists(model_path) and model_path != 'yolov8n.pt':
+            print(f"Model not found at {model_path}")
+            print("Falling back to yolov8n.pt")
             model_path = 'yolov8n.pt'
 
         self.model = YOLO(model_path)
-        print(f"✓ Model loaded: {model_path}")
+        print(f"Model loaded: {model_path}")
 
     def detect_image(self, image_path, conf_threshold=0.3):
         if not os.path.exists(image_path):
-            print(f"❌ Image not found: {image_path}")
+            print(f"Image not found: {image_path}")
             return None
 
         results = self.model.predict(
@@ -28,24 +36,22 @@ class CattleDetector:
             verbose=False
         )
 
-        # ✅ CORRECT YOLOv8 COUNT
         num_cattle = 0
         if results and results[0].boxes is not None:
             num_cattle = results[0].boxes.xyxy.shape[0]
 
         print(f"Detected {num_cattle} cattle")
 
-        # Optional: print confidence values
-        if results[0].boxes is not None:
+        if results and results[0].boxes is not None:
             for box in results[0].boxes:
-                conf = float(box.conf[0])
-                print(f"  - confidence: {conf:.2f}")
+                confidence = float(box.conf[0])
+                print(f"  confidence: {confidence:.2f}")
 
         return results
 
     def detect_video(self, video_path, conf_threshold=0.3, save_output=False):
         if not os.path.exists(video_path):
-            print(f"❌ Video not found: {video_path}")
+            print(f"Video not found: {video_path}")
             return
 
         cap = cv2.VideoCapture(video_path)
@@ -68,8 +74,8 @@ class CattleDetector:
                 break
 
             frame_count += 1
-            results = self.model(frame, conf=conf_threshold, verbose=False)
 
+            results = self.model(frame, conf=conf_threshold, verbose=False)
             annotated = results[0].plot()
 
             num_cattle = 0
@@ -95,12 +101,13 @@ class CattleDetector:
                 break
 
         cap.release()
+
         if save_output:
             out.release()
-            print(f"✓ Saved output: {output_path}")
+            print(f"Saved output: {output_path}")
 
         cv2.destroyAllWindows()
-        print(f"✓ Processed {frame_count} frames")
+        print(f"Processed {frame_count} frames")
 
 
 # =========================
@@ -108,12 +115,14 @@ class CattleDetector:
 # =========================
 
 def test_image():
-    detector = CattleDetector()
+    detector = CattleDetector()  # uses yolov8n.pt
     detector.detect_image('../tests/sample_images/cattle1.jpg')
 
+
 def test_video():
-    detector = CattleDetector()
+    detector = CattleDetector()  # uses yolov8n.pt
     detector.detect_video('../tests/sample_videos/cattle_test.mp4', save_output=True)
+
 
 if __name__ == "__main__":
     print("=" * 50)
