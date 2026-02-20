@@ -152,6 +152,10 @@ app.*.symbols
 google-services.json
 GoogleService-Info.plist
 firebase_config.json
+backend/firebase-key.json
+*.json
+!firebase.json
+!package.json
 
 
 
