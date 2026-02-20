@@ -7,7 +7,7 @@ model = YOLO('yolov8n.pt')
 cap = cv2.VideoCapture(0)
 
 BOUNDARY_Y = 300
-COW_CLASS_ID = 19
+COW_CLASS_ID = 0
 
 # Store previous positions
 previous_positions = {}
