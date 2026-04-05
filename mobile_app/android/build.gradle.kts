@@ -5,6 +5,8 @@ allprojects {
     }
 }
 
+// REMOVE the classpath line entirely — Flutter manages this via settings.gradle.kts
+
 val newBuildDir: Directory =
     rootProject.layout.buildDirectory
         .dir("../../build")

@@ -1,3 +1,4 @@
 {
-    "cmake.sourceDirectory": "D:/projects/cattle-geofence-project/mobile_app/linux"
+    "cmake.sourceDirectory": "D:/projects/cattle-geofence-project/mobile_app/linux",
+    "java.configuration.updateBuildConfiguration": "automatic"
 }
