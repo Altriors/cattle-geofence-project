@@ -246,6 +246,3 @@ Ensure the following Firebase configuration files are present before running:
 
 ---
 
-## License
-
-This project is developed for academic and research purposes under Mahatma Gandhi Institute of Technology, Hyderabad.
