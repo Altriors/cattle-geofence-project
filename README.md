@@ -1,22 +1,61 @@
-# Cattle Geo-Fencing and Detection System
+# Cattle Geo-Fencing and Boundary Violation Detection
 
-A real-time livestock monitoring system that uses computer vision to detect cattle movement near farm boundaries and notifies farmers instantly when a violation occurs.
+Real-time livestock monitoring system using YOLOv8-based object detection and Firebase Cloud Messaging to detect cattle boundary violations and notify farmers instantly.
 
-## Team
+**Academic Project** — Department of Computer Science and Engineering, Mahatma Gandhi Institute of Technology, Hyderabad (2025–2026)
 
-- T.M Nikilesh Kumar
-- T.Venu
+**Authors:** T. Venu (23261A05B7), T.M. Nikilesh Kumar (23261A05B9)  
+**Guide:** Mrs. K. Shirisha, Assistant Professor, Dept. of CSE
 
----
-Department of Computer Science and Engineering  
-Mahatma Gandhi Institute of Technology, Hyderabad
 ---
 
 ## Overview
 
-The system processes live camera feeds using a fine-tuned YOLOv8 model to detect cattle and monitor their position relative to a user-defined virtual boundary. When cattle cross the boundary, an alert is logged to Firebase Firestore and a push notification is sent to the farmer's mobile device via Firebase Cloud Messaging.
+Traditional cattle monitoring depends on manual supervision, which is labor-intensive, error-prone, and unscalable. This system eliminates that dependency by combining computer vision with cloud infrastructure to provide automated, real-time boundary monitoring.
 
-The project consists of two components: a Python backend handling detection and alert logic, and a Flutter mobile application for real-time alert monitoring and management.
+When a camera detects cattle crossing a predefined virtual boundary, the system stores an alert in Firebase Firestore and immediately dispatches a push notification to the farmer's mobile device via Firebase Cloud Messaging.
+
+---
+
+## System Architecture
+
+The system is composed of two subsystems:
+
+**Backend Detection Engine**
+- Captures live video from CCTV/IP cameras using OpenCV
+- Runs YOLOv8 inference per frame for cattle detection
+- Applies virtual geo-fence boundary validation
+- Uploads violation alerts to Firebase Firestore
+- Triggers push notifications via Firebase Cloud Messaging
+
+**Flutter Mobile Application**
+- User authentication and session management
+- Real-time alert display and incident management
+- Dashboard statistics and alert history
+- Push notification handling and acknowledgement
+
+---
+
+## Technology Stack
+
+| Layer | Technologies |
+|---|---|
+| Object Detection | YOLOv8, OpenCV, NumPy |
+| Backend / Cloud | Python 3.10+, Firebase Firestore, Firebase Cloud Messaging, Firebase Authentication |
+| Mobile Application | Flutter, Dart, Provider |
+
+---
+
+## Performance
+
+| Metric | Value |
+|---|---|
+| mAP@0.5 | 89% |
+| Precision | 91% |
+| Recall | 88% |
+| F1 Score | 89% |
+| Inference Time | ~30 ms/frame |
+| Alert Latency | < 2 seconds |
 
 ---
 
@@ -84,73 +123,80 @@ cattle-geofence-project/
 ├── tests/
 │   ├── sample_videos/
 │   └── sample_images/
-├── .gitignore
-├── README.md
-└── requirements.txt
+├── requirements.txt
+└── README.md
 ```
 
 ---
 
-## Tech Stack
+## Firestore Alert Schema
 
-**Backend**
+| Field | Type | Description |
+|---|---|---|
+| timestamp | Timestamp | Time of boundary violation |
+| cattle_count | Integer | Number of cattle detected |
+| cattle_id | Integer | Optional tracked cattle identifier |
+| boundary_crossed | Boolean | Violation status |
+| camera | String | Camera source identifier |
+| resolved | Boolean | Alert acknowledgement status |
+
+---
+
+## Requirements
+
+**Software**
 - Python 3.10+
-- YOLOv8 (Ultralytics)
-- OpenCV
-- Firebase Admin SDK (Firestore, FCM)
-- NumPy
+- Flutter SDK
+- Firebase CLI
+- VS Code or PyCharm
+- Git
 
-**Mobile**
-- Flutter 3.x (Dart)
-- Firebase Firestore
-- Firebase Cloud Messaging
-- Provider (state management)
-- Camera plugin
+**Hardware (Development)**
+- Processor: Intel i5 / AMD Ryzen 5 or higher
+- RAM: 8 GB minimum (16 GB recommended)
+- GPU: NVIDIA GPU recommended for training
 
----
-
-## How It Works
-
-1. A camera placed at the farm boundary streams live video to the backend.
-2. Each frame is processed by the YOLOv8 model to detect cattle.
-3. Detected bounding boxes are checked against the predefined virtual boundary using a point-in-polygon algorithm.
-4. If a cattle object's reference point crosses the boundary for a set number of consecutive frames, a violation is recorded.
-5. The alert document is written to Firestore with cattle count, camera ID, timestamp, and resolution status.
-6. An FCM push notification is dispatched to the farmer's device immediately.
-7. The Flutter app displays live alerts, statistics, and allows the farmer to resolve or dismiss incidents.
+**Hardware (Deployment)**
+- CCTV or IP camera at farm boundary
+- Android or iOS smartphone
+- Active internet connection
 
 ---
 
-## Alert Schema (Firestore)
+## Installation
 
-| Field             | Type      | Description                        |
-|-------------------|-----------|------------------------------------|
-| timestamp         | Timestamp | Server-generated event time        |
-| cattle_count      | Integer   | Number of cattle detected          |
-| cattle_id         | Integer   | Optional individual identifier     |
-| boundary_crossed  | Boolean   | True if boundary was violated      |
-| camera            | String    | Camera source identifier           |
-| resolved          | Boolean   | Whether the alert was acknowledged |
-
----
-
-## Setup
-
-### Backend
+Clone the repository:
 
 ```bash
 git clone https://github.com/Altriors/cattle-geofence-project.git
 cd cattle-geofence-project
+```
+
+Install Python dependencies:
+
+```bash
 pip install -r requirements.txt
 ```
 
-Place your Firebase service account key at `backend/firebase/serviceAccountKey.json`, then run:
+---
+
+## Running the Backend
+
+Before running, ensure the following are in place:
+
+- Firebase Admin SDK credentials JSON is configured in the backend directory
+- YOLOv8 model weights (`best.pt`) are placed in `backend/models/`
+- A webcam, CCTV, or IP camera is connected and accessible
 
 ```bash
 python backend/scripts/live_camera.py
 ```
 
-### Mobile App
+The backend will begin real-time detection, apply geo-fence validation, and push alerts to Firestore on boundary violations.
+
+---
+
+## Running the Mobile Application
 
 ```bash
 cd mobile_app
@@ -158,26 +204,48 @@ flutter pub get
 flutter run
 ```
 
-Ensure `google-services.json` (Android) or `GoogleService-Info.plist` (iOS) is placed in the appropriate directory before building.
+Ensure the following Firebase configuration files are present before running:
+
+- `google-services.json` — for Android (`android/app/`)
+- `GoogleService-Info.plist` — for iOS (`ios/Runner/`)
 
 ---
 
-## Model Training
+## How It Works
 
-Open `backend/notebooks/train_yolo.ipynb` in Google Colab. The notebook covers dataset loading, augmentation configuration, YOLOv8 fine-tuning, and weight export. Trained weights are saved to `backend/models/best.pt`.
-
----
-
-## Performance
-
-| Metric           | Value         |
-|------------------|---------------|
-| mAP@0.5          | 89%           |
-| Precision        | 91%           |
-| Recall           | 88%           |
-| F1 Score         | 89%           |
-| Inference Time   | ~30 ms/frame  |
-| Alert Latency    | < 2 seconds   |
+1. Camera captures a continuous live video feed from the farm boundary
+2. Each frame is processed in real time using YOLOv8
+3. Detected cattle are bounded and their positions recorded
+4. Geo-fencing logic checks detected positions against the virtual boundary
+5. A violation is confirmed after detection across multiple consecutive frames
+6. Alert data is written to Firebase Firestore
+7. A push notification is dispatched to the farmer via FCM
+8. The Flutter application displays the alert on the dashboard
 
 ---
 
+## Comparison with Existing Methods
+
+| Approach | Hardware Cost | Real-Time Alert | Mobile App | Per-Animal Device |
+|---|---|---|---|---|
+| GPS Collar Systems | High | Yes | No | Required |
+| IoT / LoRaWAN Tracking | Medium | Yes | No | Required |
+| YOLO + Camera Only | Low | No | No | Not Required |
+| Proposed System | Low | Yes | Yes | Not Required |
+
+---
+
+## Future Scope
+
+- Individual cattle identification and tracking using deep learning
+- Multi-camera centralized monitoring with alert aggregation
+- Edge deployment on Raspberry Pi or NVIDIA Jetson
+- Offline functionality for low-connectivity environments
+- Night vision and thermal imaging support
+- Analytics dashboard for cattle movement pattern analysis
+
+---
+
+## License
+
+This project is developed for academic and research purposes under Mahatma Gandhi Institute of Technology, Hyderabad.
