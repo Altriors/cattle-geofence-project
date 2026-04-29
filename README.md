@@ -147,7 +147,7 @@ pip install -r requirements.txt
 Place your Firebase service account key at `backend/firebase/serviceAccountKey.json`, then run:
 
 ```bash
-python backend/scripts/detect_cattle.py
+python backend/scripts/live_camera.py
 ```
 
 ### Mobile App
